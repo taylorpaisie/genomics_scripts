@@ -51,7 +51,6 @@ def sample_ids(args):
 
 def main():
 	parser=argparse.ArgumentParser(description="Get all the SRA files! Give me a list of SRA accessions, and I shall extract their corresponding metadta.")
-    #parser=argparse.ArgumentParser(description="Change the names in your fasta file. Make it your way or find your way on the fasta-file highway.")
 	parser.add_argument("-i",help="List of SRA Accessions to extract metadata info from.", dest="ids", type=str, required=True)
 	parser.add_argument("-o",help="Output SRA metadta csv file.", dest="output", type=str, required=True)
 	parser.set_defaults(func=sample_ids)
