@@ -27,20 +27,22 @@ def sample_ids(args):
 
     for data in sra_list:
         try:
-            df = db.sra_metadata(data)
+            df = db.sra_metadata(data, detailed=True)
             df.to_csv(data+".tsv", sep="\t", index=False)
         except:
             sys.stderr.write("Error with {}\n".format(data))
             time.sleep(0.5)
         time.sleep(0.5)
+    # print(df)
 
     # combine all the metadata files into one
+    # all tsv files must be in the working directory
     tsv_files = glob.glob('*.tsv')
     df_append = pd.DataFrame()
     for file in tsv_files:
          df_temp = pd.read_csv(file, header=0)
          df_append = df_append.append(df_temp, ignore_index=True)
-    print(type(df_append))
+    # print(df_append)
     df_append.to_csv(args.output, sep=',', index=False, header=True)
 
 
