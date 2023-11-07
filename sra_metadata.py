@@ -10,22 +10,43 @@ __version="0.1.0"
 args = ''
 import os, sys, operator, logging, argparse
 import numpy, urllib, time
-import time, json
+import time, json, csv
 import pandas as pd
+import glob
 
 from pysradb import SRAweb
 
 
 db = SRAweb()
 
+
 def sample_ids(args):
     samples = open(args.ids, 'r')
     sra = samples.read()
     sra_list = sra.split('\n')
-    print(sra_list) 
-    for sra_meta in sra_list:
-        df = db.sra_metadata(sra_meta)
-        df.to_csv(args.output, sep=",", index=False)
+    print(sra_list)
+
+    for data in sra_list:
+        try:
+            df = db.sra_metadata(data)
+            df.to_csv(data, sep="\t", index=False)
+        except:
+            sys.stderr.write("Error with {}\n".format(data))
+            time.sleep(0.5)
+        time.sleep(0.5)
+
+    # combine all the metadata files into one
+    all_files = glob.glob("*.tsv")
+    all = []
+    for filename in all_files:
+         dfs = pd.read_csv(filename, index_col=None, header=0)
+         all.append(dfs)
+         print(all)
+    frame = pd.concat(all, axis=0, ignore_index=True)
+    print(frame)
+    frame.to_csv(args.output, sep=',', index=False)
+
+
 
 
 def main():
