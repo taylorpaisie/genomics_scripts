@@ -13,7 +13,6 @@ import numpy, urllib, time
 import time, json, csv
 import pandas as pd
 import glob
-
 from pysradb import SRAweb
 
 
@@ -29,22 +28,20 @@ def sample_ids(args):
     for data in sra_list:
         try:
             df = db.sra_metadata(data)
-            df.to_csv(data, sep="\t", index=False)
+            df.to_csv(data+".tsv", sep="\t", index=False)
         except:
             sys.stderr.write("Error with {}\n".format(data))
             time.sleep(0.5)
         time.sleep(0.5)
 
     # combine all the metadata files into one
-    all_files = glob.glob("*.tsv")
-    all = []
-    for filename in all_files:
-         dfs = pd.read_csv(filename, index_col=None, header=0)
-         all.append(dfs)
-         print(all)
-    frame = pd.concat(all, axis=0, ignore_index=True)
-    print(frame)
-    frame.to_csv(args.output, sep=',', index=False)
+    tsv_files = glob.glob('*.tsv')
+    df_append = pd.DataFrame()
+    for file in tsv_files:
+         df_temp = pd.read_csv(file, header=0)
+         df_append = df_append.append(df_temp, ignore_index=True)
+    print(type(df_append))
+    df_append.to_csv(args.output, sep=',', index=False, header=True)
 
 
 
