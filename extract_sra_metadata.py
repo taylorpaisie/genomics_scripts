@@ -1,9 +1,10 @@
 #!/usr/bin/env python
-"""This script is to download SRA metadata json file from a list of SRA Accessions. 
-This will download json files related to SRA Accession.
+"""This script takes a list of SRA Accessions in the format of a text file. 
+This will get and parse the json file related to SRA Accession and output
+the queries of interest into a text file.
 Author: Taylor K. Paisie <ltj8@cdc.gov>
 Version: 0.1.0
-Date: 2023-11-06
+Date: 2023-11-08
 """
 
 __version="0.1.0"
@@ -38,24 +39,37 @@ def extract_meta(args):
 
     with open(args.output, 'w') as output_file:
         # Write column headers to the output file
-        output_file.write("SRR Accession\t" + args.query1 + "\t" + args.query2 + "\n")
+        column_headers = ["SRR Accession"]
+        if args.query1:
+            column_headers.append(args.query1)
+        if args.query2:
+            column_headers.append(args.query2)
+        output_file.write("\t".join(column_headers) + "\n")
+        
         # Iterate through the data and write the desired columns
         for accession, item in result_dict.items():
-            meta_value1 = item.get(args.query1, "N/A")  # Use .get() to provide a default value if the key is not found
-            meta_value2 = item.get(args.query2, "N/A")  # Use .get() to provide a default value if the key is not found
-            output_file.write(f"{accession}\t{meta_value1}\t{meta_value2}\n")
-
+            values = [accession]
+            if args.query1:
+                meta_value1 = item.get(args.query1, "N/A")
+                values.append(meta_value1)
+            if args.query2:
+                meta_value2 = item.get(args.query2, "N/A")
+                values.append(meta_value2)
+            output_file.write("\t".join(values) + "\n")
 
 def main():
-    parser = argparse.ArgumentParser(description="Parse a JSON file and output desired columns to a text file.")
+    parser = argparse.ArgumentParser(description="Extract metadata from SRA Accessions and write to a text file.")
     parser.add_argument("-i", help="List of SRA Accessions to extract metadata info from.", dest="ids", type=str, required=True)
-    parser.add_argument('-q1', help="First metadata query of interest.", dest="query1", type=str, required=True)
-    parser.add_argument('-q2', help="Second metadata query of interest.", dest="query2", type=str, required=True)
+    parser.add_argument('-q1', help="First metadata query of interest.", dest="query1", type=str)
+    parser.add_argument('-q2', help="Second metadata query of interest.", dest="query2", type=str)
     parser.add_argument("-o", help="Output text file for SRA metadata of interest.", dest="output", type=str, required=True)
     parser.set_defaults(func=extract_meta)
     args = parser.parse_args()
+
+    if not args.query1 and not args.query2:
+        parser.error("You must provide at least one query with either -q1 or -q2.")
+
     args.func(args)
 
 if __name__ == "__main__":
     main()
-
