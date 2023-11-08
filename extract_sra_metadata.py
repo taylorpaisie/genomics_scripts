@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 """This script takes a list of SRA Accessions in the format of a text file. 
 This will get and parse the json file related to SRA Accession and output
-the queries of interest into a text file.
+the queries of interest into a text file. 
+BEFORE RUNNING SCRIPT, MUST INSTALL PYSRADB
+conda create -c bioconda -n pysradb PYTHON=3.10 pysradb
 Author: Taylor K. Paisie <ltj8@cdc.gov>
 Version: 0.1.0
 Date: 2023-11-08
