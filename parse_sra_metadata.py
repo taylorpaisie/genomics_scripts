@@ -22,8 +22,6 @@ def parse_meta(args):
 	
     feat.to_csv(args.output, sep='\t', index=False, header=True)
 	
-	
-
 
 def main():
 	parser=argparse.ArgumentParser(description="Parse a text file with SRA metadata.")
