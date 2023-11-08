@@ -40,10 +40,6 @@ def sample_ids(args):
     with open(args.output, "w") as outfile:
         outfile.write(meta_json)
 
-
-
-
-
 def main():
 	parser=argparse.ArgumentParser(description="Get all the SRA files! Give me a list of SRA accessions, and I shall extract their corresponding metadta.")
 	parser.add_argument("-i",help="List of SRA Accessions to extract metadata info from.", dest="ids", type=str, required=True)
