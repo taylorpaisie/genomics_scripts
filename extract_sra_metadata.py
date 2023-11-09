@@ -6,7 +6,7 @@ BEFORE RUNNING SCRIPT, MUST INSTALL PYSRADB
 conda create -c bioconda -n pysradb PYTHON=3.10 pysradb
 Author: Taylor K. Paisie <ltj8@cdc.gov>
 Version: 0.1.0
-Date: 2023-11-08
+Date: 2023-11-09
 """
 
 __version="0.1.0"
@@ -60,11 +60,22 @@ def extract_meta(args):
             output_file.write("\t".join(values) + "\n")
 
 def main():
-    parser = argparse.ArgumentParser(description="Extract metadata from SRA Accessions and write to a text file.")
-    parser.add_argument("-i", help="List of SRA Accessions to extract metadata info from.", dest="ids", type=str, required=True)
-    parser.add_argument('-q1', help="First metadata query of interest.", dest="query1", type=str)
-    parser.add_argument('-q2', help="Second metadata query of interest.", dest="query2", type=str)
-    parser.add_argument("-o", help="Output text file for SRA metadata of interest.", dest="output", type=str, required=True)
+    parser = argparse.ArgumentParser(description="Extract metadata from SRA Accessions and write to a text file.", 
+                                     add_help=False)
+    req = parser.add_argument_group('Required')
+    req.add_argument("-i", help="List of SRA Accessions to extract metadata info from.", 
+                     dest="ids", type=str, required=True)
+    req.add_argument('-q1', help="First metadata query of interest.", 
+                     dest="query1", type=str, required=True)
+    req.add_argument("-o", help="Output text file for SRA metadata of interest.", 
+                        dest="output", type=str, required=True)
+    opt = parser.add_argument_group('Optional')
+    opt.add_argument('-h', '--help', action='help',
+                help='show this help message and exit')
+    opt.add_argument('-q2', help="Second metadata query of interest.", 
+                     dest="query2", type=str)
+
+    
     parser.set_defaults(func=extract_meta)
     args = parser.parse_args()
 
