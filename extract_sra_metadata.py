@@ -73,18 +73,19 @@ def main():
     parser = argparse.ArgumentParser(description="Extract metadata from SRA Accessions and write to a text file.",
                                      add_help=False)
     req = parser.add_argument_group('Required')
-    req.add_argument("-i", help="List of SRA Accessions to extract metadata info from.",
+    req.add_argument("-i", '--input', help="List of SRA Accessions to extract metadata info from. Either a SRA Accession ID or a text file with SRA Accession IDs is required.",
                      dest="input_file", type=str)
-    req.add_argument('-q1', help="First metadata query of interest.",
+    req.add_argument('-q1', '--query1',help="First metadata query of interest.",
                      dest="query1", type=str, required=True)
-    req.add_argument("-o", help="Output text file for SRA metadata of interest.",
+    req.add_argument("-o", '--output',help="Output text file for SRA metadata of interest.",
                       dest="output", type=str, required=True)
     opt = parser.add_argument_group('Optional')
     opt.add_argument('-h', '--help', action='help',
                      help='show this help message and exit')
-    opt.add_argument('-q2', help="Second metadata query of interest.",
+    opt.add_argument('-q2', '--query2',help="Second metadata query of interest.",
                      dest="query2", type=str)
-    opt.add_argument('-s', help="SRA Accessions as a string.",
+    opt.add_argument('-s', '--sra_accession', 
+                     help="Takes a SRA Accession ID. Either a SRA Accession ID or a text file with SRA Accession IDs is required.",
                      dest="input_string", type=str)
 
     parser.set_defaults(func=extract_meta)
