@@ -6,7 +6,7 @@ BEFORE RUNNING SCRIPT, MUST INSTALL PYSRADB
 conda create -c bioconda -n pysradb PYTHON=3.10 pysradb
 Author: Taylor K. Paisie <ltj8@cdc.gov>
 Version: 0.1.0
-Date: 2023-11-09
+Date: 2023-11-08
 """
 
 __version="0.1.0"
@@ -19,9 +19,19 @@ import pandas as pd
 import glob
 import pysradb
 
+
 def extract_meta(args):
-    samples = open(args.ids, 'r')
-    sra = samples.read()
+    if args.input_file:
+        # Read SRA Accessions from the input file
+        with open(args.input_file, 'r') as file:
+            sra = file.read()
+    elif args.input_string:
+        # Use the provided SRA Accessions as a string
+        sra = args.input_string
+    else:
+        print("Error: You must provide either an input file or a string.")
+        sys.exit(1)
+
     sra_list = sra.split('\n')
     print(sra_list)
 
@@ -41,13 +51,13 @@ def extract_meta(args):
 
     with open(args.output, 'w') as output_file:
         # Write column headers to the output file
-        column_headers = ["SRR Accession"]
+        column_headers = ["SRA Accession"]
         if args.query1:
             column_headers.append(args.query1)
         if args.query2:
             column_headers.append(args.query2)
         output_file.write("\t".join(column_headers) + "\n")
-        
+
         # Iterate through the data and write the desired columns
         for accession, item in result_dict.items():
             values = [accession]
@@ -60,22 +70,23 @@ def extract_meta(args):
             output_file.write("\t".join(values) + "\n")
 
 def main():
-    parser = argparse.ArgumentParser(description="Extract metadata from SRA Accessions and write to a text file.", 
+    parser = argparse.ArgumentParser(description="Extract metadata from SRA Accessions and write to a text file.",
                                      add_help=False)
     req = parser.add_argument_group('Required')
-    req.add_argument("-i", help="List of SRA Accessions to extract metadata info from.", 
-                     dest="ids", type=str, required=True)
-    req.add_argument('-q1', help="First metadata query of interest.", 
+    req.add_argument("-i", help="List of SRA Accessions to extract metadata info from.",
+                     dest="input_file", type=str)
+    req.add_argument('-q1', help="First metadata query of interest.",
                      dest="query1", type=str, required=True)
-    req.add_argument("-o", help="Output text file for SRA metadata of interest.", 
-                        dest="output", type=str, required=True)
+    req.add_argument("-o", help="Output text file for SRA metadata of interest.",
+                      dest="output", type=str, required=True)
     opt = parser.add_argument_group('Optional')
     opt.add_argument('-h', '--help', action='help',
-                help='show this help message and exit')
-    opt.add_argument('-q2', help="Second metadata query of interest.", 
+                     help='show this help message and exit')
+    opt.add_argument('-q2', help="Second metadata query of interest.",
                      dest="query2", type=str)
+    opt.add_argument('-s', help="SRA Accessions as a string.",
+                     dest="input_string", type=str)
 
-    
     parser.set_defaults(func=extract_meta)
     args = parser.parse_args()
 
