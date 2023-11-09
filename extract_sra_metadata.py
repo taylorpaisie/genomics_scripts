@@ -6,7 +6,7 @@ BEFORE RUNNING SCRIPT, MUST INSTALL PYSRADB
 conda create -c bioconda -n pysradb PYTHON=3.10 pysradb
 Author: Taylor K. Paisie <ltj8@cdc.gov>
 Version: 0.1.0
-Date: 2023-11-08
+Date: 2023-11-09
 """
 
 __version="0.1.0"
