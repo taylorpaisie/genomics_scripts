@@ -27,12 +27,12 @@ def extract_meta(args):
             sra = file.read()
     elif args.input_string:
         # Use the provided SRA Accessions as a string
-        sra = args.input_string
+        sra = ' '.join(args.input_string)
     else:
         print("Error: You must provide either an input file or a string.")
         sys.exit(1)
 
-    sra_list = sra.split('\n')
+    sra_list = sra.split()  # Split by whitespace
     print(sra_list)
 
     sras = []
@@ -40,10 +40,11 @@ def extract_meta(args):
 
     for meta in sra_list:
         metadata = db.sra_metadata(meta)
-        sras.append(metadata)
+        if not metadata.empty:  # Check if the DataFrame is not empty
+            sras.append(metadata)
     print(sras)
 
-    meta_json = json.dumps([m.to_dict(orient="records")[0] for m in sras], indent=2)
+    meta_json = json.dumps([m.to_dict(orient="records")[0] for m in sras if not m.empty], indent=2)
     # Parse the JSON string into a list of dictionaries
     data = json.loads(meta_json)
     # Create a dictionary with "run_accession" as the key
@@ -51,7 +52,7 @@ def extract_meta(args):
 
     with open(args.output, 'w') as output_file:
         # Write column headers to the output file
-        column_headers = ["SRA Accession"]
+        column_headers = ["SRR Accession"]
         if args.query1:
             column_headers.append(args.query1)
         if args.query2:
@@ -68,6 +69,8 @@ def extract_meta(args):
                 meta_value2 = item.get(args.query2, "N/A")
                 values.append(meta_value2)
             output_file.write("\t".join(values) + "\n")
+
+
 
 def main():
     parser = argparse.ArgumentParser(description="Extract metadata from SRA Accessions and write to a text file.",
@@ -86,13 +89,16 @@ def main():
                      dest="query2", type=str)
     opt.add_argument('-s', '--sra_accession', 
                      help="Takes a SRA Accession ID. Either a SRA Accession ID or a text file with SRA Accession IDs is required.",
-                     dest="input_string", type=str)
+                     dest="input_string", type=str, nargs='+')
 
     parser.set_defaults(func=extract_meta)
     args = parser.parse_args()
 
     if not args.query1 and not args.query2:
         parser.error("You must provide at least one query with either -q1 or -q2.")
+    if not args.input_file and not args.input_string:
+        parser.error("You must provide either an input file or a string.")
+
 
     args.func(args)
 
