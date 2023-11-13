@@ -6,7 +6,7 @@ BEFORE RUNNING SCRIPT, MUST INSTALL PYSRADB
 conda create -c bioconda -n pysradb PYTHON=3.10 pysradb
 Author: Taylor K. Paisie <ltj8@cdc.gov>
 Version: 0.1.0
-Date: 2023-11-09
+Date: 2023-11-08
 """
 
 __version="0.1.0"
@@ -51,7 +51,6 @@ def extract_meta(args):
         print("\nAll Fields in Metadata:")
         print("\t".join(all_fields))
     else:
-        # Continue with metadata extraction and writing to the output file
         meta_json = json.dumps([m.to_dict(orient="records")[0] for m in sras if not m.empty], indent=2)
         # Parse the JSON string into a list of dictionaries
         data = json.loads(meta_json)
@@ -61,21 +60,17 @@ def extract_meta(args):
         with open(args.output, 'w') as output_file:
             # Write column headers to the output file
             column_headers = ["SRR Accession"]
-            if args.query1:
-                column_headers.append(args.query1)
-            if args.query2:
-                column_headers.append(args.query2)
+            if args.queries:
+                for query in args.queries:
+                    column_headers.append(query)
             output_file.write("\t".join(column_headers) + "\n")
 
             # Iterate through the data and write the desired columns
             for accession, item in result_dict.items():
                 values = [accession]
-                if args.query1:
-                    meta_value1 = item.get(args.query1, "N/A")
-                    values.append(meta_value1)
-                if args.query2:
-                    meta_value2 = item.get(args.query2, "N/A")
-                    values.append(meta_value2)
+                for query in args.queries:
+                    meta_value = item.get(query, "N/A")
+                    values.append(meta_value)
                 output_file.write("\t".join(values) + "\n")
 
 def main():
@@ -84,29 +79,29 @@ def main():
     req = parser.add_argument_group('Required')
     req.add_argument("-i", help="List of SRA Accessions to extract metadata info from.",
                      dest="input_file", type=str)
-    req.add_argument('-q1', help="First metadata query of interest.",
-                     dest="query1", type=str)
+    req.add_argument('-q', help="Metadata queries of interest.",
+                     dest="queries", type=str, nargs='+')
     req.add_argument("-o", help="Output text file for SRA metadata of interest.",
                       dest="output", type=str)
     opt = parser.add_argument_group('Optional')
     opt.add_argument('-h', '--help', action='help',
                      help='show this help message and exit')
-    opt.add_argument('-q2', help="Second metadata query of interest.",
-                     dest="query2", type=str)
     opt.add_argument('-s', help="SRA Accessions as a string.",
                      dest="input_string", nargs='+')
-    opt.add_argument('-d','--display-all-fields', action='store_true',
+    opt.add_argument('--display-all-fields', action='store_true',
                      help="Display all fields present in the generated JSON file.")
 
     parser.set_defaults(func=extract_meta)
     args = parser.parse_args()
 
     if args.display_all_fields:
-        args.query1 = None
+        args.queries = None
         args.output = None
 
     if not args.input_file and not args.input_string:
         parser.error("You must provide either an input file or a string.")
+    if args.queries and len(args.queries) < 2:
+        parser.error("Please provide at least two queries using -q.")
 
     args.func(args)
 
