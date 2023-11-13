@@ -79,7 +79,7 @@ def main():
     req = parser.add_argument_group('Required')
     req.add_argument("-i", help="List of SRA Accessions to extract metadata info from.",
                      dest="input_file", type=str)
-    req.add_argument('-q', help="Metadata queries of interest.",
+    req.add_argument('-q', help="Metadata query or queries of interest. Provide one or two queries.",
                      dest="queries", type=str, nargs='+')
     req.add_argument("-o", help="Output text file for SRA metadata of interest.",
                       dest="output", type=str)
@@ -100,8 +100,8 @@ def main():
 
     if not args.input_file and not args.input_string:
         parser.error("You must provide either an input file or a string.")
-    if args.queries and len(args.queries) < 2:
-        parser.error("Please provide at least two queries using -q.")
+    if args.queries and len(args.queries) > 2:
+        parser.error("Please provide one or two queries using -q.")
 
     args.func(args)
 
