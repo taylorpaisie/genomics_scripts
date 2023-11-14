@@ -88,7 +88,7 @@ def main():
                      help='show this help message and exit')
     opt.add_argument('-s', help="SRA Accessions as a string.",
                      dest="input_string", nargs='+')
-    opt.add_argument('--display-all-fields', action='store_true',
+    opt.add_argument('-d', '--display-all-fields', action='store_true',
                      help="Display all fields present in the generated JSON file.")
 
     parser.set_defaults(func=extract_meta)
