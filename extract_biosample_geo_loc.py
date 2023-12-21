@@ -23,15 +23,15 @@ def get_geo_loc_name(biosample_id, api_key=None):
 
 
 # Replace 'your_ncbi_api_key' with your actual NCBI API key if you have one
-api_key = "c213d2297c5c890297e3ae5af5c1b6c2d408"
+api_key = sys.argv[1]
 
 # Read biosample IDs from the file
-file_path = sys.argv[1]
+file_path = sys.argv[2]
 with open(file_path, 'r') as file:
     biosample_ids = file.readlines()
 
 # Output file path
-output_file_path = sys.argv[2]
+output_file_path = sys.argv[3]
 
 # Processing all biosample IDs from the list
 with open(output_file_path, 'w') as output_file:
